@@ -1,0 +1,149 @@
+"""
+Python Banking System (Erweitertes Lern-Beispiel)
+
+Demonstriert:
+1. Objektorientierte Programmierung (OOP) & Kapselung
+2. Variablen-Initialisierung im Konstruktor
+3. Unendliche Steuerungsschleife (while True)
+4. Mehrfach-Verzweigungen (if / elif / else)
+5. Fehlerbehandlung bei Benutzereingaben (try / except)
+"""
+
+
+class BankAccount:
+    """Klasse zur Repräsentation eines einzelnen Bankkontos."""
+
+    def __init__(self, account_number: str, account_holder: str, initial_balance: float = 0.0):
+        """
+        Der Konstruktor: Hier werden alle Instanzvariablen deklariert und initialisiert!
+        
+        IN PYTHON GILT:
+        Es gibt keine separate Deklarationszeile wie in Java (z.B. 'private double balance;').
+        Variablen werden erzeugt, indem man 'self._variablenname = wert' schreibt.
+        
+        Der führende Unterstrich (_) signalisiert anderen Entwicklern: 
+        'Diese Variable ist geschützt (geschützt/private) und soll nicht direkt von außen geändert werden!'
+        """
+        # --- DEKLARATION & INITIALISIERUNG DER VARIABLEN ---
+        self._account_number = account_number  # Speichert die Kontonummer (String)
+        self._account_holder = account_holder  # Speichert den Namen des Inhabers (String)
+        self._balance = initial_balance        # Speichert den aktuellen Kontostand (Float/Kommazahl)
+
+    # --- GETTER-METHODEN (Properties für sicheren Lesezugriff) ---
+    @property
+    def account_number(self) -> str:
+        """Gibt die Kontonummer zurück (nur lesend)."""
+        return self._account_number
+
+    @property
+    def account_holder(self) -> str:
+        """Gibt den Namen des Kontoinhabers zurück (nur lesend)."""
+        return self._account_holder
+
+    @property
+    def balance(self) -> float:
+        """Gibt den aktuellen Kontostand zurück (nur lesend)."""
+        return self._balance
+
+    # --- GESCHÄFTSLOGIK / METHODEN ---
+    def deposit(self, amount: float) -> None:
+        """
+        Zahlt Geld auf das Konto ein.
+        Prüfung (Validierung): Der Betrag muss größer als 0 sein.
+        """
+        if amount > 0:
+            self._balance += amount  # Kurzform für: self._balance = self._balance + amount
+            print(f"✅ Erfolgreich {amount:.2f} € eingezahlt.")
+        else:
+            print("❌ Ungültiger Einzahlungsbetrag! Betrag muss positiv sein.")
+
+    def withdraw(self, amount: float) -> None:
+        """
+        Hebt Geld vom Konto ab.
+        Sicherheitsprüfung: Auszahlung nur möglich, wenn genug Guthaben vorhanden ist.
+        """
+        if amount > 0 and amount <= self._balance:
+            self._balance -= amount  # Kurzform für: self._balance = self._balance - amount
+            print(f"✅ Erfolgreich {amount:.2f} € abgehoben.")
+        elif amount > self._balance:
+            print("❌ Fehler: Unzureichendes Guthaben auf dem Konto!")
+        else:
+            print("❌ Ungültiger Auszahlungsbetrag!")
+
+    def display_status(self) -> None:
+        """Gibt die Kontodaten übersichtlich auf der Konsole aus."""
+        print("\n----------------------------------")
+        print(f" Kontoinhaber:  {self._account_holder}")
+        print(f" IBAN/Konto-NR: {self._account_number}")
+        print(f" Kontostand:    {self._balance:.2f} €")
+        print("----------------------------------\n")
+
+
+def main():
+    """Hauptfunktion zur Ausführung und Menüsteuerung."""
+    
+    # 1. OBJEKT ERSTELLEN (Instanziierung)
+    # Hier rufen wir den Konstruktor __init__ auf und übergeben die Startwerte.
+    account = BankAccount(
+        account_number="DE123456789", 
+        account_holder="Sascha Philipp", 
+        initial_balance=500.0
+    )
+
+    print("==========================================")
+    print("   WILLKOMMEN IM PYTHON BANKING SYSTEM")
+    print("==========================================")
+
+    # 2. HAUPTSTEUERUNGSSCHLEIFE (Endlosschleife)
+    # 'while True' bedeutet: Die Schleife läuft unendlich lange weiter, 
+    # bis sie explizit durch das Befehlswort 'break' abgebrochen wird.
+    while True:
+        # Menü-Optionen ausgeben
+        print("\nBitte wählen Sie eine Option:")
+        print("1 - Kontostand anzeigen")
+        print("2 - Geld einzahlen")
+        print("3 - Geld abheben")
+        print("4 - Programm beenden")
+
+        # Benutzereingabe abfragen (.strip() entfernt versehentliche Leerzeichen)
+        choice = input("Ihre Auswahl (1-4): ").strip()
+
+        # 3. MEHRFACHVERZWEIGUNG (if / elif / else)
+        # Überprüft Schritt für Schritt, welche Taste der User gedrückt hat:
+        
+        if choice == "1":
+            # Option 1: Status-Methode des Objekts aufrufen
+            account.display_status()
+
+        elif choice == "2":
+            # Option 2: Geld einzahlen mit Fehlerabfangung (try/except)
+            try:
+                # float() wandelt den eingegebenen Text in eine Kommazahl um
+                amount = float(input("Geben Sie den Einzahlungsbetrag in € ein: "))
+                account.deposit(amount)
+            except ValueError:
+                # Falls der User Text statt einer Zahl eingibt (z.B. "zehn"), stürzt das Programm nicht ab!
+                print("❌ Ungültige Eingabe! Bitte geben Sie eine reine Zahl ein.")
+
+        elif choice == "3":
+            # Option 3: Geld abheben mit Fehlerabfangung
+            try:
+                amount = float(input("Geben Sie den Auszahlungsbetrag in € ein: "))
+                account.withdraw(amount)
+            except ValueError:
+                print("❌ Ungültige Eingabe! Bitte geben Sie eine reine Zahl ein.")
+
+        elif choice == "4":
+            # Option 4: Schleife mit 'break' beenden
+            print("\nVielen Dank für die Nutzung unseres Banking Systems. Auf Wiedersehen!")
+            break  # Hier bricht die 'while True'-Schleife ab -> Das Programm endet sauber.
+
+        else:
+            # Greift, wenn der User irgendetwas anderes eingegeben hat (z.B. "5" oder "Hallo")
+            print("❌ Ungültige Auswahl! Bitte geben Sie eine Zahl von 1 bis 4 ein.")
+
+
+# Startpunkt des Programms: Stellt sicher, dass main() nur ausgeführt wird,
+# wenn diese Datei direkt gestartet wird (und nicht als Modul importiert wird).
+if __name__ == "__main__":
+    main()
